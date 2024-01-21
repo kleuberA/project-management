@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import * as z from 'zod';
 import useSupabase from '@/hooks/useSupabase';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 const schema = z.object({
     email: z.string().email(),
@@ -26,27 +27,44 @@ export default function SignInComponent() {
         resolver: zodResolver(schema),
     });
 
-    async function teste() {
+    async function isAuthenticated() {
         const { data } = await supabase.auth.getSession();
-        console.log(data.session?.user)
+        console.log(data);
         if (data.session?.user) {
             router.push('/home')
         }
     }
 
-    teste()
+    isAuthenticated();
 
     async function submitHandler(dataForm: UserFormData) {
-        console.log(dataForm);
 
         const { data, error } = await supabase.auth.signInWithPassword({
             email: dataForm.email,
             password: dataForm.password,
         })
 
-        console.log(data);
-        console.log(error);
-
+        if (data.session?.user) {
+            toast.success('Login successful!',
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                        border: '1px solid #3d3d3d'
+                    },
+                });
+        } else {
+            toast.error(error?.message + '!' || 'Invalid Credentials!',
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                        border: '1px solid #3d3d3d'
+                    },
+                });
+        }
     }
 
     return (

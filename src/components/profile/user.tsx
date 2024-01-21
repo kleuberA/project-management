@@ -2,8 +2,8 @@
 
 import useSupabase from "@/hooks/useSupabase";
 import { useEffect, useState } from "react";
-import SignOut from "../auth/signout";
 import { useRouter } from "next/navigation";
+import SignOut from "../auth/signout";
 
 export default function User() {
 
@@ -16,7 +16,6 @@ export default function User() {
         const fetchData = async () => {
             try {
                 const { data } = await supabase.auth.getSession();
-                console.log(data.session?.user);
                 if (data) {
                     setUserData(data);
                 }
@@ -31,14 +30,13 @@ export default function User() {
         fetchData();
 
     }, []);
-
-    console.log(userData);
+    console.log(userData)
 
     return (
         <section>
             {userData?.session?.user && (
                 <div>
-                    <span>{userData?.session.user.user_metadata.first_name}</span>
+                    <span>{userData?.session.user.user_metadata.first_name}{" "}{userData?.session.user.user_metadata.last_name}</span>
                     <h1>{userData?.session?.user.email}</h1>
                 </div>
             )}

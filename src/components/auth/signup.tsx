@@ -7,6 +7,7 @@ import useSupabase from '@/hooks/useSupabase';
 
 const schema = z.object({
     name: z.string(),
+    lastName: z.string(),
     email: z.string().email(),
     password: z.string(),
 });
@@ -34,6 +35,7 @@ export default function SignUpComponent() {
             options: {
                 data: {
                     first_name: dataForm.name,
+                    last_name: dataForm.lastName,
                 }
             }
         })
@@ -48,6 +50,8 @@ export default function SignUpComponent() {
             <form onSubmit={handleSubmit(submitHandler)}>
                 <input type="text" {...register('name')} />
                 {errors.name?.message && <p>{errors.name?.message}</p>}
+                <input type="text" {...register('lastName')} />
+                {errors.lastName?.message && <p>{errors.lastName?.message}</p>}
                 <input {...register('email')} type='email' />
                 {errors.email?.message && <p>{errors.email?.message}</p>}
                 <input type="password" {...register('password')} />
