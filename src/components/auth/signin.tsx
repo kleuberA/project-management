@@ -73,12 +73,10 @@ export default function SignInComponent() {
     return (
         <section className='w-full h-full flex flex-col justify-center items-center'>
             <div className='flex items-start w-[25dvw] flex-col gap-2'>
-                <div></div>
                 <h1 className='text-2xl text-white font-bold font-mono'>Bem vindo de volta</h1>
                 <span className='text-sm text-[#6f6f6f] font-mono font-medium'>Faça login em sua conta</span>
             </div>
             <form onSubmit={handleSubmit(submitHandler)} className='flex flex-col gap-10 w-[25dvw] h-[50dvh] justify-center'>
-
                 <div>
                     <div className='pb-2'>
                         <Label htmlFor='email' className='text-[#6e6e6e]'>Email</Label>
