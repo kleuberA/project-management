@@ -4,6 +4,9 @@ import useSupabase from "@/hooks/useSupabase";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SignOut from "../auth/signout";
+import { ModeToggle } from "../toggle-theme";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export default function User() {
 
@@ -30,15 +33,22 @@ export default function User() {
         fetchData();
 
     }, []);
-    console.log(userData)
+    // console.log(userData)
 
     return (
         <section>
             {userData?.session?.user && (
-                <div>
-                    <span>{userData?.session.user.user_metadata.first_name}{" "}{userData?.session.user.user_metadata.last_name}</span>
-                    <h1>{userData?.session?.user.email}</h1>
-                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className="bg-background text-accent-foreground w-10 h-10 flex items-center justify-center border border-border rounded-sm">
+                            {userData?.session?.user?.user_metadata?.first_name.charAt(0).toUpperCase()}
+                            {userData?.session?.user?.user_metadata?.last_name.charAt(0).toUpperCase()}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <ModeToggle />
+                    </DropdownMenuContent>
+                </DropdownMenu>
             )}
             <SignOut />
         </section>
