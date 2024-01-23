@@ -1,3 +1,4 @@
+import HeaderMenu from "@/components/headerMenu/Header";
 import User from "@/components/profile/user";
 import { Metadata } from "next";
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
     return (
         <div>
+            <HeaderMenu />
             <User />
         </div>
     )
