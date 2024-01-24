@@ -12,13 +12,13 @@ export function ModeToggle() {
     return (
         <section className="flex flex-col gap-2 justify-start items-start">
             <Button variant="theme" onClick={() => setTheme("light")} className="flex flex-row items-center gap-1 h-8 justify-start">
-                {theme == 'light' && <DotFilledIcon />} Light
+                {theme == 'light' && <DotFilledIcon className="text-secondary" />} Light
             </Button>
             <Button variant="theme" onClick={() => setTheme("dark")} className="gap-1 h-8">
-                {theme == 'dark' && <DotFilledIcon />}Dark
+                {theme == 'dark' && <DotFilledIcon className="text-secondary" />}Dark
             </Button>
             <Button variant="theme" onClick={() => setTheme("system")} className="flex flex-row items-center gap-1 h-8 justify-start">
-                {theme == 'system' && <DotFilledIcon />}System
+                {theme == 'system' && <DotFilledIcon className="text-secondary" />}System
             </Button>
         </section>
     )
