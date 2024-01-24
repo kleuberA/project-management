@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import useUpdateProfileQuery from '@/hooks/use-update-profile';
 
 const schema = z.object({
     name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
@@ -44,7 +45,13 @@ export default function SignUpComponent() {
             }
         })
 
-        console.log(data);
+        let dataUser = {
+            first_name: data.user?.user_metadata.first_name,
+            last_name: data.user?.user_metadata.last_name,
+            user_id: data.user?.id
+        }
+        let user = useUpdateProfileQuery(supabase, dataUser);
+        console.log(user);
         console.log(error);
 
     }

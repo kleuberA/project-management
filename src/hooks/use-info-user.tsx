@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
 import useSupabase from "./useSupabase";
-import { CaretSortIcon } from "@radix-ui/react-icons";
 
 function useInfoUser() {
     const supabase = useSupabase();
