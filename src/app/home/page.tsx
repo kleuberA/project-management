@@ -1,5 +1,6 @@
 import HeaderMenu from "@/components/headerMenu/Header";
 import User from "@/components/profile/user";
+import SideMenu from "@/components/sideMenu/Side";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,8 +10,9 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
     return (
-        <div>
+        <div className="w-full h-screen">
             <HeaderMenu />
+            <SideMenu />
         </div>
     )
 }
