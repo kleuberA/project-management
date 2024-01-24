@@ -11,7 +11,6 @@ export default function HomePage() {
     return (
         <div>
             <HeaderMenu />
-            <User />
         </div>
     )
 }
