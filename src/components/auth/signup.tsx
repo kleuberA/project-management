@@ -65,7 +65,7 @@ export default function SignUpComponent() {
             <form onSubmit={handleSubmit(submitHandler)} className='flex flex-col gap-5 w-[25dvw] h-[50dvh] justify-center'>
                 <div className='flex flex-row gap-2'>
                     <div className=''>
-                        <Label htmlFor='firstName' className='text-[#6e6e6e]'>Firs Name</Label>
+                        <Label htmlFor='firstName' className='text-[#6e6e6e]'>First Name</Label>
                         <Input id='firstName' type="text" placeholder='John' {...register('name')} className={`${errors.name?.message && 'border-[#d25151] bg-[#d25151] bg-opacity-20 transition-all duration-200'}`} />
                         {errors.name?.message && <span className='text-xs text-[#d25151]'>{errors.name?.message}</span>}
                     </div>
