@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import type { Database } from '@/utils/database.types';
 
 export type TypedSupabaseClient = SupabaseClient<Database>;
@@ -17,3 +17,13 @@ export function getSupabaseBrowserClient() {
 
     return client;
 }
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: {
+        autoRefreshToken: false,
+        persistSession: false
+    }
+})
+
+// Access auth admin api
+export const adminAuthClient = supabase.auth.admin

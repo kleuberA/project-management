@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 export default function Logo() {
     return (
-        <section>[Logo]</section>
+        <Link href="/home">[Logo]</Link>
     )
 }
