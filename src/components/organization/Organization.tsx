@@ -1,39 +1,23 @@
 "use client"
 
-import useInfoUser from "@/hooks/use-info-user"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { useState } from "react";
-import { CaretSortIcon, CheckIcon, PlusIcon } from "@radix-ui/react-icons";
-import { Button } from "../ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../ui/command";
-import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import CreateOrganization from "./create/CreateOrganization";
-
-const organizations = [
-    {
-        value: "next.js",
-        label: "Next.js",
-    },
-    {
-        value: "sveltekit",
-        label: "SvelteKit",
-    },
-    {
-        value: "nuxt.js",
-        label: "Nuxt.js",
-    },
-    {
-        value: "remix",
-        label: "Remix",
-    },
-    {
-        value: "astro",
-        label: "Astro",
-    },
-]
+import useOrganizations from "@/hooks/useOrganizations";
+import useInfoUser from "@/hooks/use-info-user"
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Organization() {
+
+    const [DataOrganization, setDataOrganization] = useState<any>();
+    const organizationsData = useOrganizations();
+
+    useEffect(() => {
+        setDataOrganization(organizationsData);
+    }, [organizationsData]);
 
     const user = useInfoUser();
     const [open, setOpen] = useState(false)
@@ -46,11 +30,11 @@ export default function Organization() {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-[200px] justify-between hover:bg-border text-xs border-0 rounded-sm"
+                    className=" justify-between hover:bg-border text-xs border-0 rounded-sm"
                 >
                     {value
-                        ? organizations.find((organization) => organization.value === value)?.label
-                        : user}
+                        ? value
+                        : 'No Select Organization'}
                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
@@ -62,20 +46,20 @@ export default function Organization() {
                         <CommandItem className="hover:bg-transparent text-xs bg-transparent p-0">
                             <CreateOrganization />
                         </CommandItem>
-                        {organizations.map((organization) => (
+                        {organizationsData?.map((organization: any) => (
                             <CommandItem
-                                key={organization.value}
-                                value={organization.value}
+                                key={organization.id}
+                                value={organization.name_organization.toUppercase}
                                 onSelect={(currentValue) => {
-                                    setValue(currentValue === value ? "" : currentValue)
-                                    setOpen(false)
+                                    setValue(currentValue === value ? "" : currentValue);
+                                    setOpen(false);
                                 }}
                             >
-                                {organization.label}
+                                {organization.name_organization}
                                 <CheckIcon
                                     className={cn(
                                         "ml-auto h-4 w-4 text-secondary",
-                                        value === organization.value ? "opacity-100" : "opacity-0"
+                                        value === organization.name_organization ? "opacity-100" : "opacity-0"
                                     )}
                                 />
                             </CommandItem>

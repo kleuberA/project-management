@@ -1,10 +1,8 @@
 import { UpdateProfileType } from "@/types/update-profile-type";
-import { getProfile } from "@/queries/update-profile";
-import { useQuery } from "@tanstack/react-query";
 import { TypedSupabaseClient } from "@/utils/supabase";
+import { getProfile } from "@/queries/update-profile";
 
 async function useUpdateProfileQuery(client: TypedSupabaseClient, user: UpdateProfileType) {
-    console.log(user)
     const queryKey = ['profiles', user];
 
     const queryFn = async () => {

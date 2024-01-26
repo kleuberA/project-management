@@ -1,5 +1,5 @@
+import HomeContainer from "@/components/homeContainer/Home";
 import HeaderMenu from "@/components/headerMenu/Header";
-import User from "@/components/profile/user";
 import SideMenu from "@/components/sideMenu/Side";
 import { Metadata } from "next";
 
@@ -12,7 +12,14 @@ export default function HomePage() {
     return (
         <div className="w-full h-screen">
             <HeaderMenu />
-            <SideMenu />
+            <div className="flex flex-row">
+                <div>
+                    <SideMenu />
+                </div>
+                <div className="flex-1">
+                    <HomeContainer />
+                </div>
+            </div>
         </div>
     )
 }
