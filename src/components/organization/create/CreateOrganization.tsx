@@ -1,11 +1,30 @@
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
+
+const FormSchema = z.object({
+    typeSelect: z.string(),
+    name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
+    planSelect: z.string()
+})
 
 export default function CreateOrganization() {
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+    })
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+        console.log(data);
+    }
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -19,49 +38,74 @@ export default function CreateOrganization() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-                    <div className="w-full flex flex-col gap-10">
-                        <div className="flex flex-col gap-3">
-                            <Label className="text-accent-foreground" htmlFor="organizationName">Name</Label>
-                            <Input placeholder="Name Organization" id="organizationName" type="text" className="w-full" />
-                        </div>
-                        <div className="flex flex-row justify-between">
-                            <div className="flex flex-col gap-3">
-                                <Label className="text-accent-foreground">Type Organization</Label>
-                                <Select>
-                                    <SelectTrigger className="w-[280px]">
-                                        <SelectValue placeholder="Type Organization" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="personal">Personal</SelectItem>
-                                            <SelectItem value="educational">Educational</SelectItem>
-                                            <SelectItem value="startup">Startup</SelectItem>
-                                            <SelectItem value="company">Company</SelectItem>
-                                            <SelectItem value="agency">Agency</SelectItem>
-                                            <SelectItem value="n/a">N/A</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
+
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Name Organization" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex flex-row justify-between">
+                                <FormField
+                                    control={form.control}
+                                    name="typeSelect"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Type Organization</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="w-[280px]">
+                                                        <SelectValue placeholder="Type Organization" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="personal">Personal</SelectItem>
+                                                    <SelectItem value="educational">Educational</SelectItem>
+                                                    <SelectItem value="startup">Startup</SelectItem>
+                                                    <SelectItem value="company">Company</SelectItem>
+                                                    <SelectItem value="agency">Agency</SelectItem>
+                                                    <SelectItem value="n/a">N/A</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="planSelect"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Plan Organization</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="w-[280px]">
+                                                        <SelectValue placeholder="Plan Organization" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="free">Free 0R$ - Month</SelectItem>
+                                                    <SelectItem value="pro">Pro 35R$ - Month</SelectItem>
+                                                    <SelectItem value="team">Team 699R$ - Month</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
-                            <div className="flex flex-col gap-3">
-                                <Label className="text-accent-foreground">Plan Organization</Label>
-                                <Select>
-                                    <SelectTrigger className="w-[280px]">
-                                        <SelectValue placeholder="Select Plan" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="free">Free 0R$ - Month</SelectItem>
-                                            <SelectItem value="pro">Pro 35R$ - Month</SelectItem>
-                                            <SelectItem value="team">Team 699R$ - Month</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                    </div>
+                            <Button type="submit" variant="secondary">Create</Button>
+                        </form>
+                    </Form>
                 </div>
                 <DialogFooter className="">
                     <DialogClose asChild>
@@ -69,7 +113,6 @@ export default function CreateOrganization() {
                             Cancel
                         </Button>
                     </DialogClose>
-                    <Button type="submit" variant="secondary">Create</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
