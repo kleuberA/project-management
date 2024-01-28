@@ -1,6 +1,6 @@
 "use client"
 import CreateOrganization from "../organization/create/CreateOrganization";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { ExclamationTriangleIcon, QuestionMarkCircledIcon } from "@radix-ui/react-icons";
 import useOrganizations from "@/hooks/useOrganizations"
 import { Button } from "../ui/button";
 
@@ -19,6 +19,15 @@ export default function HomeContainer() {
                     <Button variant="secondary">
                         <CreateOrganization />
                     </Button>
+                </div>
+            )}
+
+            {organizationsData?.length !== 0 && (
+                <div className="w-96 h-44 flex flex-col gap-3 justify-center items-center rounded-md border-2 border-dashed border-secondary p-2">
+                    <span className="font-bold text-secondary">
+                        <QuestionMarkCircledIcon width={30} height={30} />
+                    </span>
+                    <span className="text-base text-accent-foreground font-mono font-semibold">Select an organization to view projects.</span>
                 </div>
             )}
         </section>

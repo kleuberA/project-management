@@ -1,3 +1,4 @@
+"use client"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -8,6 +9,10 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
+import useSupabase from "@/hooks/useSupabase";
+import { insertOrganizations } from "@/queries/create-organization";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const FormSchema = z.object({
     typeSelect: z.string(),
@@ -17,12 +22,47 @@ const FormSchema = z.object({
 
 export default function CreateOrganization() {
 
+    const supabase = useSupabase();
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
+    async function onSubmit(dataForm: z.infer<typeof FormSchema>) {
+        const { data } = await supabase.auth.getSession();
+
+        let dataInsert = {
+            name_organization: dataForm.name,
+            type_organization: dataForm.typeSelect,
+            plan_organization: dataForm.planSelect,
+            id_owner: data.session?.user.id as string
+        }
+        const queryInsertOrganization = await insertOrganizations(supabase, dataInsert);
+
+        if (queryInsertOrganization) {
+            toast.success("Organization created successfully!",
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#1c1c1c',
+                        color: '#fff',
+                        border: '1px solid #2e2e2e'
+                    },
+                });
+            router.refresh();
+            form.reset();
+        } else {
+            toast.error("Error creating organization!",
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#1c1c1c',
+                        color: '#fff',
+                        border: '1px solid #2e2e2e'
+                    },
+                });
+        }
     }
 
     return (
@@ -103,7 +143,7 @@ export default function CreateOrganization() {
                                     )}
                                 />
                             </div>
-                            <Button type="submit" variant="secondary">Create</Button>
+                            <Button type="submit" variant="secondary" className="w-full">Create</Button>
                         </form>
                     </Form>
                 </div>
