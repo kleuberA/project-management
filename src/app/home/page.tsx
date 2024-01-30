@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
     return (
         <div className="w-full h-screen">
-            <HeaderMenu />
+            <HeaderMenu visiblyOrganization />
             <div className="flex flex-row">
                 <div>
                     <SideMenu />
