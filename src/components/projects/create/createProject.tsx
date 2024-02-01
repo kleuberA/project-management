@@ -1,17 +1,21 @@
 "use client"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import useSupabase from "@/hooks/useSupabase";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon, PlusIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import useSupabase from "@/hooks/useSupabase";
-import { insertOrganizations } from "@/queries/create-organization";
-import { useRouter } from "next/navigation";
+import { format } from "date-fns"
+import { Calendar } from "@/components/ui/calendar";
 
 const FormSchema = z.object({
     typeSelect: z.string(),
@@ -19,10 +23,11 @@ const FormSchema = z.object({
     planSelect: z.string()
 })
 
-export default function CreateOrganization() {
+export default function CreateProject() {
 
     const supabase = useSupabase();
     const router = useRouter();
+    const [date, setDate] = useState<Date>()
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -37,43 +42,43 @@ export default function CreateOrganization() {
             plan_organization: dataForm.planSelect,
             id_owner: data.session?.user.id as string
         }
-        const queryInsertOrganization = await insertOrganizations(supabase, dataInsert);
+        // const queryInsertOrganization = await insertOrganizations(supabase, dataInsert);
 
-        if (queryInsertOrganization) {
-            toast.success("Organization created successfully!",
-                {
-                    style: {
-                        borderRadius: '5px',
-                        background: '#1c1c1c',
-                        color: '#fff',
-                        border: '1px solid #2e2e2e'
-                    },
-                });
-            router.refresh();
-            form.reset();
-        } else {
-            toast.error("Error creating organization!",
-                {
-                    style: {
-                        borderRadius: '5px',
-                        background: '#1c1c1c',
-                        color: '#fff',
-                        border: '1px solid #2e2e2e'
-                    },
-                });
-        }
+        // if (queryInsertOrganization) {
+        //     toast.success("Organization created successfully!",
+        //         {
+        //             style: {
+        //                 borderRadius: '5px',
+        //                 background: '#1c1c1c',
+        //                 color: '#fff',
+        //                 border: '1px solid #2e2e2e'
+        //             },
+        //         });
+        //     router.refresh();
+        //     form.reset();
+        // } else {
+        //     toast.error("Error creating organization!",
+        //         {
+        //             style: {
+        //                 borderRadius: '5px',
+        //                 background: '#1c1c1c',
+        //                 color: '#fff',
+        //                 border: '1px solid #2e2e2e'
+        //             },
+        //         });
+        // }
     }
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="createOrganization" className="flex gap-1 h-8 text-xs justify-start p-2"><PlusIcon />Create Organization</Button>
+                <Button variant="secondary" className="flex gap-1 h-8 text-xs justify-start p-2"><PlusIcon />Create Project</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px]">
                 <DialogHeader>
-                    <DialogTitle className="">Create Organization</DialogTitle>
+                    <DialogTitle className="">Create Project</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
-                        This is your organization within [Sem nome]. For example, you can use the name of your company.
+                        Create the project that will be used in your organization
                     </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
@@ -142,6 +147,28 @@ export default function CreateOrganization() {
                                     )}
                                 />
                             </div>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-[240px] justify-start text-left font-normal",
+                                            !date && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={setDate}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
                             <Button type="submit" variant="secondary" className="w-full">Create</Button>
                         </form>
                     </Form>

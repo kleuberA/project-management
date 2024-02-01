@@ -1,5 +1,6 @@
 "use client"
-
+import CreateProject from "@/components/projects/create/createProject";
+import { Button } from "@/components/ui/button";
 import useOrganizationByIdQuery from "@/hooks/use-get-organization-by-id";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
@@ -20,6 +21,7 @@ export default function GetOrganizationById(props: GetOrganizationByIdProps) {
                         <ExclamationTriangleIcon width={20} height={20} />
                     </span>
                     <span className="text-base text-center text-accent-foreground font-mono font-semibold">You do not have any projects in this organization.</span>
+                    <CreateProject />
                 </div>
             ) : (
                 <div>
