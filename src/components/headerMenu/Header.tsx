@@ -11,7 +11,6 @@ interface HeaderProps {
 export default function HeaderMenu({ visiblyOrganization, organizationId }: HeaderProps) {
 
     const { data, error } = useOrganizationByIdQuery(organizationId as string);
-    console.log(data);
 
     return (
         <section className="w-full h-12 border-b border-b-border">
