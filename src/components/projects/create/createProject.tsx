@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,7 +20,13 @@ import { Calendar } from "@/components/ui/calendar";
 const FormSchema = z.object({
     typeSelect: z.string(),
     name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
-    planSelect: z.string()
+    planned_start: z.date({
+        required_error: "A date of birth is required.",
+    }),
+    planned_end: z.date({
+        required_error: "A date of birth is required.",
+    }),
+    description: z.string()
 })
 
 export default function CreateProject() {
@@ -36,12 +42,12 @@ export default function CreateProject() {
     async function onSubmit(dataForm: z.infer<typeof FormSchema>) {
         const { data } = await supabase.auth.getSession();
 
-        let dataInsert = {
-            name_organization: dataForm.name,
-            type_organization: dataForm.typeSelect,
-            plan_organization: dataForm.planSelect,
-            id_owner: data.session?.user.id as string
-        }
+        // let dataInsert = {
+        //     name_organization: dataForm.name,
+        //     type_organization: dataForm.typeSelect,
+        //     plan_organization: dataForm.planSelect,
+        //     id_owner: data.session?.user.id as string
+        // }
         // const queryInsertOrganization = await insertOrganizations(supabase, dataInsert);
 
         // if (queryInsertOrganization) {
@@ -82,7 +88,6 @@ export default function CreateProject() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
-
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
                             <FormField
@@ -92,7 +97,7 @@ export default function CreateProject() {
                                     <FormItem>
                                         <FormLabel>Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Name Organization" {...field} />
+                                            <Input placeholder="Name Project" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -101,74 +106,106 @@ export default function CreateProject() {
                             <div className="flex flex-row justify-between">
                                 <FormField
                                     control={form.control}
-                                    name="typeSelect"
+                                    name="planned_start"
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Type Organization</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="w-[280px]">
-                                                        <SelectValue placeholder="Type Organization" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="personal">Personal</SelectItem>
-                                                    <SelectItem value="educational">Educational</SelectItem>
-                                                    <SelectItem value="startup">Startup</SelectItem>
-                                                    <SelectItem value="company">Company</SelectItem>
-                                                    <SelectItem value="agency">Agency</SelectItem>
-                                                    <SelectItem value="n/a">N/A</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Date Project Start</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-[240px] pl-3 text-left font-normal",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(field.value, "PPP")
+                                                            ) : (
+                                                                <span>Pick a date</span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={field.onChange}
+                                                        disabled={(date) =>
+                                                            date > new Date() || date < new Date("1900-01-01")
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormDescription>
+                                                Project start date.
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="planSelect"
+                                    name="planned_end"
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Plan Organization</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="w-[280px]">
-                                                        <SelectValue placeholder="Plan Organization" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="free">Free 0R$ - Month</SelectItem>
-                                                    <SelectItem value="pro">Pro 35R$ - Month</SelectItem>
-                                                    <SelectItem value="team">Team 699R$ - Month</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Date Project End</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-[240px] pl-3 text-left font-normal",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(field.value, "PPP")
+                                                            ) : (
+                                                                <span>Pick a date</span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={field.onChange}
+                                                        disabled={(date) =>
+                                                            date > new Date() || date < new Date("1900-01-01")
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormDescription>
+                                                Project end date
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-[240px] justify-start text-left font-normal",
-                                            !date && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={date}
-                                        onSelect={setDate}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Description Project" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <Button type="submit" variant="secondary" className="w-full">Create</Button>
                         </form>
                     </Form>
