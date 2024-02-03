@@ -16,9 +16,13 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar";
+import { insertProject } from "@/queries/create-project";
+
+interface CreateProjectProps {
+    id_organization: string | undefined
+}
 
 const FormSchema = z.object({
-    typeSelect: z.string(),
     name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
     planned_start: z.date({
         required_error: "A date of birth is required.",
@@ -29,7 +33,7 @@ const FormSchema = z.object({
     description: z.string()
 })
 
-export default function CreateProject() {
+export default function CreateProject({ id_organization }: CreateProjectProps) {
 
     const supabase = useSupabase();
     const router = useRouter();
@@ -40,39 +44,40 @@ export default function CreateProject() {
     })
 
     async function onSubmit(dataForm: z.infer<typeof FormSchema>) {
-        const { data } = await supabase.auth.getSession();
 
-        // let dataInsert = {
-        //     name_organization: dataForm.name,
-        //     type_organization: dataForm.typeSelect,
-        //     plan_organization: dataForm.planSelect,
-        //     id_owner: data.session?.user.id as string
-        // }
-        // const queryInsertOrganization = await insertOrganizations(supabase, dataInsert);
+        let dataInsert = {
+            id_organization: id_organization as string,
+            name: dataForm.name,
+            planned_start_date: dataForm.planned_start.toISOString(),
+            planned_end_date: dataForm.planned_end.toISOString(),
+            description: dataForm.description,
+        }
 
-        // if (queryInsertOrganization) {
-        //     toast.success("Organization created successfully!",
-        //         {
-        //             style: {
-        //                 borderRadius: '5px',
-        //                 background: '#1c1c1c',
-        //                 color: '#fff',
-        //                 border: '1px solid #2e2e2e'
-        //             },
-        //         });
-        //     router.refresh();
-        //     form.reset();
-        // } else {
-        //     toast.error("Error creating organization!",
-        //         {
-        //             style: {
-        //                 borderRadius: '5px',
-        //                 background: '#1c1c1c',
-        //                 color: '#fff',
-        //                 border: '1px solid #2e2e2e'
-        //             },
-        //         });
-        // }
+        const queryInsertProject = await insertProject(supabase, dataInsert);
+
+        if (queryInsertProject) {
+            toast.success("Project created successfully!",
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#1c1c1c',
+                        color: '#fff',
+                        border: '1px solid #2e2e2e'
+                    },
+                });
+            router.refresh();
+            form.reset();
+        } else {
+            toast.error("Error creating project!",
+                {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#1c1c1c',
+                        color: '#fff',
+                        border: '1px solid #2e2e2e'
+                    },
+                });
+        }
     }
 
     return (
@@ -134,9 +139,6 @@ export default function CreateProject() {
                                                         mode="single"
                                                         selected={field.value}
                                                         onSelect={field.onChange}
-                                                        disabled={(date) =>
-                                                            date > new Date() || date < new Date("1900-01-01")
-                                                        }
                                                         initialFocus
                                                     />
                                                 </PopoverContent>
@@ -178,9 +180,6 @@ export default function CreateProject() {
                                                         mode="single"
                                                         selected={field.value}
                                                         onSelect={field.onChange}
-                                                        disabled={(date) =>
-                                                            date > new Date() || date < new Date("1900-01-01")
-                                                        }
                                                         initialFocus
                                                     />
                                                 </PopoverContent>
