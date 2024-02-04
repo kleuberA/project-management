@@ -1,22 +1,21 @@
 "use client"
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import useSupabase from "@/hooks/useSupabase";
-import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, PlusIcon } from "@radix-ui/react-icons";
+import { insertProject } from "@/queries/create-project";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import useSupabase from "@/hooks/useSupabase";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { format } from "date-fns";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { z } from "zod";
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar";
-import { insertProject } from "@/queries/create-project";
 
 interface CreateProjectProps {
     id_organization: string | undefined
@@ -25,10 +24,10 @@ interface CreateProjectProps {
 const FormSchema = z.object({
     name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
     planned_start: z.date({
-        required_error: "A date of birth is required.",
+        required_error: "A date of planned start is required.",
     }),
     planned_end: z.date({
-        required_error: "A date of birth is required.",
+        required_error: "A date of planned end is required.",
     }),
     description: z.string()
 })
@@ -37,7 +36,6 @@ export default function CreateProject({ id_organization }: CreateProjectProps) {
 
     const supabase = useSupabase();
     const router = useRouter();
-    const [date, setDate] = useState<Date>()
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -54,6 +52,21 @@ export default function CreateProject({ id_organization }: CreateProjectProps) {
         }
 
         const queryInsertProject = await insertProject(supabase, dataInsert);
+
+        const { data } = await supabase.from('project')
+            .select('id')
+            .eq('name', dataForm.name)
+
+        const projectId = data && data[0] && data[0].id;
+        console.log(projectId);
+
+        if (projectId) {
+            const { error } = await supabase
+                .from('organizations')
+                .update({ projects: projectId })
+                .eq('id', id_organization as string);
+            console.log(error);
+        }
 
         if (queryInsertProject) {
             toast.success("Project created successfully!",
