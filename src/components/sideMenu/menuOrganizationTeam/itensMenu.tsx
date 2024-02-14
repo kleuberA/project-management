@@ -1,10 +1,16 @@
-import { HomeIcon } from "@radix-ui/react-icons";
+import { ChatCircleDots, SquaresFour } from "@phosphor-icons/react";
 
 export const ItensMenu = [
     {
         id: 1,
         name: "Home",
         path: "/home",
-        icon: <HomeIcon width={20} height={20} />
+        icon: <SquaresFour size={20} />
+    },
+    {
+        id: 2,
+        name: "Messages",
+        path: "/organization/messages",
+        icon: <ChatCircleDots size={20} />
     }
 ]
