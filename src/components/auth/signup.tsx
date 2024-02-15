@@ -9,6 +9,7 @@ import { Label } from '../ui/label';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import useUpdateProfileQuery from '@/hooks/use-update-profile';
+import { useRouter } from 'next/navigation';
 
 const schema = z.object({
     name: z.string().min(3, { message: "O nome deve ter no minimo 3 caracteres." }),
@@ -23,13 +24,21 @@ type UserFormData = z.infer<typeof schema>
 export default function SignUpComponent() {
 
     const supabase = useSupabase();
+    const router = useRouter();
 
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm<UserFormData>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            name: '',
+            lastName: '',
+            email: '',
+            password: ''
+        }
     });
 
     async function submitHandler(dataForm: UserFormData) {
@@ -41,6 +50,7 @@ export default function SignUpComponent() {
                 data: {
                     first_name: dataForm.name,
                     last_name: dataForm.lastName,
+                    avatar_url: ""
                 }
             }
         })
@@ -51,8 +61,11 @@ export default function SignUpComponent() {
             user_id: data.user?.id
         }
         let user = useUpdateProfileQuery(supabase, dataUser);
-        console.log(user);
-        console.log(error);
+
+        if (!error) {
+            reset();
+            router.push('/auth/signin');
+        }
 
     }
 

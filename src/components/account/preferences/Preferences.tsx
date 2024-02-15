@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import useSupabase from "@/hooks/useSupabase";
 import { adminAuthClient } from "@/utils/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { PersonIcon } from "@radix-ui/react-icons";
+import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -25,15 +26,13 @@ export default function AccountPreferences() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [lastSignIn, setLastSignIn] = useState<string | any>();
     const [createdAt, setCreatedAt] = useState<string | any>();
-
-
-
-
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
 
     useEffect(() => {
         async function fetchData() {
             let user = await supabase.auth.getSession();
-            console.log(user.data.session);
+
             setLastSignIn(`${user.data.session?.user.last_sign_in_at?.slice(0, 10).split("-").reverse().join("/")} as ${user.data.session?.user.last_sign_in_at?.slice(11, 20)}`)
             setCreatedAt(`${user.data.session?.user.created_at?.slice(0, 10).split("-").reverse().join("/")} as ${user.data.session?.user.created_at?.slice(11, 20)}`);
             setIdUser(user.data.session?.user.id);
@@ -82,6 +81,64 @@ export default function AccountPreferences() {
         }
     }
 
+    async function UploadAvatarImage(event: any) {
+        event.preventDefault();
+
+        const inputElement = event.target as HTMLInputElement;
+
+        if (!inputElement.files || inputElement.files.length === 0) {
+            console.log('error');
+        } else {
+            const selectedImage = inputElement.files[0];
+            const imageUrl = URL.createObjectURL(selectedImage);
+            const file = inputElement.files[0];
+
+            setAvatarPreview(imageUrl);
+            setFile(file);
+        }
+    }
+
+    async function HandleUploadAvatar(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (file) {
+            const { data, error } = await supabase.storage.from('avatars').upload(`avatar/${idUser}`, file, {
+                cacheControl: '10',
+                upsert: true
+            });
+
+            const { data: getUrlPublicAvatar } = supabase
+                .storage
+                .from('avatars')
+                .getPublicUrl(`avatar/${idUser}.png`);
+
+            await supabase.auth.updateUser({
+                data: { avatar_url: getUrlPublicAvatar.publicUrl.replace('.png', '') }
+            })
+
+            if (data) {
+                toast.success('Avatar updated successfully!', {
+                    style: {
+                        borderRadius: '5px',
+                        background: '#1c1c1c',
+                        color: '#fff',
+                        border: '1px solid #2e2e2e'
+                    },
+                });
+                setAvatarPreview(null);
+            } else {
+                toast.error(error.message + '!',
+                    {
+                        style: {
+                            borderRadius: '5px',
+                            background: '#1c1c1c',
+                            color: '#fff',
+                            border: '1px solid #2e2e2e'
+                        },
+                    });
+            }
+        }
+    }
+
     return (
         <section className="w-full h-[calc(100dvh_-_3rem)]">
             <div className="p-5 w-full h-full">
@@ -92,21 +149,34 @@ export default function AccountPreferences() {
                             <div className="p-3 border-b border-border w-full">
                                 <h1 className="text-accent-foreground font-mono text-lg font-bold">Informations Account</h1>
                             </div>
-                            <form onSubmit={handleSubmit(submitHandler)} className="p-4 flex flex-col gap-3" >
-                                <div>
-                                    <label className="button text-sm cursor-pointer hover:bg-border transition-all duration-300 border border-border w-20 h-20 rounded-sm flex justify-center items-center" htmlFor="single">
-                                        Avatar
-                                    </label>
-                                    <input
-                                        style={{
-                                            visibility: 'hidden',
-                                            position: 'absolute',
-                                        }}
-                                        type="file"
-                                        id="single"
-                                        accept="image/*"
+                            <form className="p-4 flex gap-2 flex-col" onSubmit={(event) => HandleUploadAvatar(event)}>
+                                {avatarPreview ? (
+                                    <img
+                                        src={avatarPreview}
+                                        alt="Avatar Preview"
+                                        className="w-32 h-32 rounded-sm object-contain"
                                     />
-                                </div>
+                                ) : (
+                                    <label
+                                        className="button text-sm cursor-pointer hover:bg-border transition-all duration-300 border border-border w-32 h-32 rounded-sm flex justify-center items-center"
+                                        htmlFor="single"
+                                    >
+                                        <PersonIcon width={35} height={35} />
+                                    </label>
+                                )}
+                                <input
+                                    style={{
+                                        visibility: 'hidden',
+                                        position: 'absolute',
+                                    }}
+                                    type="file"
+                                    id="single"
+                                    accept="image/*"
+                                    onChange={(event) => UploadAvatarImage(event)}
+                                />
+                                <Button className="w-32" variant="secondary">Upload</Button>
+                            </form>
+                            <form onSubmit={handleSubmit(submitHandler)} className="p-4 flex flex-col gap-3" >
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor='firstName' className='text-[#6e6e6e] font-mono'>First Name</Label>
                                     <Input id='firstName' type="text" placeholder='John' {...register('name')} className={`${errors.name?.message && 'border-[#d25151] bg-[#d25151] bg-opacity-20 transition-all duration-200'}`} />

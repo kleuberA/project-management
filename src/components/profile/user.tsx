@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SignOut from "../auth/signout";
 import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function User() {
 
@@ -39,10 +40,15 @@ export default function User() {
             {userData?.session?.user && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="bg-background text-accent-foreground w-10 h-9 flex items-center justify-center border border-border rounded-sm">
-                            {userData?.session?.user?.user_metadata?.first_name.charAt(0).toUpperCase()}
-                            {userData?.session?.user?.user_metadata?.last_name.charAt(0).toUpperCase()}
-                        </Button>
+                        <Avatar className="h-9 w-9 cursor-pointer">
+                            {userData?.session?.user?.user_metadata?.avatar_url && (
+                                <AvatarImage src={userData?.session?.user?.user_metadata?.avatar_url} />
+                            )}
+                            <AvatarFallback className="h-9 w-9 cursor-pointer text-sm bg-background hover:bg-border transition-all duration-300 text-accent-foreground border border-border">
+                                {userData?.session?.user?.user_metadata?.first_name.charAt(0).toUpperCase()}
+                                {userData?.session?.user?.user_metadata?.last_name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <ModeToggle />
