@@ -26,10 +26,14 @@ export default function AccountPreferences() {
     const [lastSignIn, setLastSignIn] = useState<string | any>();
     const [createdAt, setCreatedAt] = useState<string | any>();
 
+
+
+
+
     useEffect(() => {
         async function fetchData() {
             let user = await supabase.auth.getSession();
-            console.log(user.data.session?.user.created_at)
+            console.log(user.data.session);
             setLastSignIn(`${user.data.session?.user.last_sign_in_at?.slice(0, 10).split("-").reverse().join("/")} as ${user.data.session?.user.last_sign_in_at?.slice(11, 20)}`)
             setCreatedAt(`${user.data.session?.user.created_at?.slice(0, 10).split("-").reverse().join("/")} as ${user.data.session?.user.created_at?.slice(11, 20)}`);
             setIdUser(user.data.session?.user.id);
@@ -89,6 +93,20 @@ export default function AccountPreferences() {
                                 <h1 className="text-accent-foreground font-mono text-lg font-bold">Informations Account</h1>
                             </div>
                             <form onSubmit={handleSubmit(submitHandler)} className="p-4 flex flex-col gap-3" >
+                                <div>
+                                    <label className="button text-sm cursor-pointer hover:bg-border transition-all duration-300 border border-border w-20 h-20 rounded-sm flex justify-center items-center" htmlFor="single">
+                                        Avatar
+                                    </label>
+                                    <input
+                                        style={{
+                                            visibility: 'hidden',
+                                            position: 'absolute',
+                                        }}
+                                        type="file"
+                                        id="single"
+                                        accept="image/*"
+                                    />
+                                </div>
                                 <div className="flex flex-col gap-2">
                                     <Label htmlFor='firstName' className='text-[#6e6e6e] font-mono'>First Name</Label>
                                     <Input id='firstName' type="text" placeholder='John' {...register('name')} className={`${errors.name?.message && 'border-[#d25151] bg-[#d25151] bg-opacity-20 transition-all duration-200'}`} />
